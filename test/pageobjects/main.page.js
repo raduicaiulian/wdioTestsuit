@@ -21,24 +21,6 @@ class MainPage extends Page {
     //------------------------optional selectors-----------------------
     //get trueCheckBanner() { return $('div[aria-label="Trucheck tutorial"]')};
     // get outsideTrueCheckBanner() { return $('div[aria-label="Trucheck tutorial"]').parentElement().parentElement()};
-    
-    async countPagesNumber(){
-        
-
-        //var page = 2;
-        var page = 140;
-
-        while(! await this.isLastPage(page)){
-
-            if(await this.pageExist(page))
-                page = page*2
-            else
-                page = await this.binarySearch(Math.floor(page/2),page)
-        }
-
-        console.log("count of pages is: " + page);
-        //should lawnch multiple instances in order to process the results quicker
-    }
 
     async search (location) {
         const input = await this.inputLocation;//we need wait for selector promise to be resolved
@@ -61,7 +43,7 @@ class MainPage extends Page {
 
     async extractAllSearchResults(){
         this.listOfLocations=[];      
-        var i=0;
+
         await browser.pause( 400);
         const aDealOfTheWeek = await this.dealOfTheWeek;
         await browser.pause( 400);
@@ -69,29 +51,18 @@ class MainPage extends Page {
         //-------------neeeds a lot of optimization
         while(await ((await this.nextArrow).isDisplayed())) {
 
-            await this.porcessResultsList(i);
+            await this.porcessResultsList();
 
             const anextArrow = await this.nextArrow;
             //await anextArrow.waitForDisplayed();
             await browser.pause(200);
             await anextArrow.click();
             await browser.pause(200);
-            //reduce range for debugging
-            // if(i==1){
-            //     //max 189
-            //     await browser.url(`https://www.bayut.com/for-sale/property/dubai/dubai-marina/page-188/`)
-            //     i=189
-            // }else
-                i++
         }
         await this.porcessResultsList(i);
-        //should close Trucheck tutorial(becouse we are not scrolin, there is no need to worry abou it)
-        //await outsideTrueCheckBanner().click();
-        //trueCheckBanner.waitForDisplayed({reverse: true});
     }
 
-        async porcessResultsList(i) {
-        console.log(i+" tiems");
+        async porcessResultsList() {
 
         var entireList = await this.list;
         await entireList.waitForDisplayed();        
@@ -113,43 +84,6 @@ class MainPage extends Page {
         await expect(purposeVal).toHaveText(value,
             { message: 'The purpose is different from the expected one!', });
     }
-
-    // async binarySearch(lboundary, rboundary){
-    //     //console.log("***************" + lboundary + "  " + rboundary)
-
-    //     var mboundary = Math.floor((lboundary + rboundary) / 2); 
-    //     if (! await this.isLastPage(mboundary)) {
-    //         if(await this.pageExist(mboundary))
-    //             return await this.binarySearch(mboundary+1, rboundary)
-    //         else
-    //             return await this.binarySearch(lboundary, mboundary-1)
-    //     }else
-    //         return mboundary;
-    // }
-
-    // async pageExist(page){
-    //     var gUrl = this.searchDubaiMarinaUrl + page + '/'
-    //     await browser.url(gUrl);
-
-    //     const title = await browser.getTitle()
-
-    //     if(title.includes("Not found")){
-    //         //console.log("page " + page + "exist")
-    //         return false
-    //     }
-    //     //console.log("page " + page + " does NOT exist")
-    //     return true
-    // }
-
-    // async isLastPage(page){
-
-    //     if((!await this.pageExist(page+1) && await this.pageExist(page))){
-    //         //console.log("page " + page + "is the last")
-    //         return true
-    //     }
-    //     //console.log("page " + page + "is NOT the last")
-    //     return false
-    // }
 
     async simplyWait(secondsCount){
         await browser.pause(secondsCount*1000);
