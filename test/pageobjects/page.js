@@ -1,13 +1,19 @@
-/**
-* main page object containing all methods, selectors and functionality
-* that is shared across all page objects
-*/
 module.exports = class Page {
-    /**
-    * Opens a sub page of the page
-    * @param path path of the sub page (e.g. /path/to/page.html)
-    */
+
     open (path) {
-        return browser.url(`https://the-internet.herokuapp.com/${path}`)
-    }
+        return browser.url(`${path}`);
+    };
+
+    async scroll(xVal, yVal){
+        await browser.execute(
+            (xVal, yVal) => window.scrollTo(window.scrollX + xVal, window.scrollY + yVal)
+        ,xVal, yVal);
+    };
+
+    //scroll to until a specific element is visible at the top of the viewport
+    async scrollTo(selector){
+        await browser.execute(
+            (selector) => document.querySelector(selector).scrollIntoView(true/*alignToTop*/)
+        ,selector);
+    };
 }
